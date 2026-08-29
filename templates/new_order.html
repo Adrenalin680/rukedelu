@@ -1,0 +1,139 @@
+{% extends "base.html" %}
+
+{% block title %}Новый заказ{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center mt-4">
+    <div class="col-md-8">
+        <div class="card" style="border-radius: 15px; border: none; box-shadow: 0 10px 30px rgba(0,0,0,0.2);">
+            <div class="card-header" style="background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%); border-radius: 15px 15px 0 0; color: white; padding: 20px;">
+                <h4 class="mb-0"><i class="bi bi-plus-circle"></i> Создание заявки</h4>
+            </div>
+            <div class="card-body" style="padding: 30px;">
+                <form method="POST" id="orderForm" action="{{ url_for('new_order') }}">
+                    {{ form.hidden_tag() }}
+                    
+                    <div class="mb-3">
+                        {{ form.service_type.label(class="form-label", style="color: #1a1a2e; font-weight: 500;") }}
+                        {{ form.service_type(class="form-select", style="border-radius: 10px; border: 2px solid #e0e0e0; padding: 10px;", id="serviceType") }}
+                        {% for error in form.service_type.errors %}
+                            <span class="text-danger">{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                    
+                    <div class="mb-3">
+                        {{ form.description.label(class="form-label", style="color: #1a1a2e; font-weight: 500;") }}
+                        {{ form.description(class="form-control", rows="4", style="border-radius: 10px; border: 2px solid #e0e0e0; padding: 10px;", placeholder="Опишите вашу проблему подробно...") }}
+                        {% for error in form.description.errors %}
+                            <span class="text-danger">{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            {{ form.location.label(class="form-label", style="color: #1a1a2e; font-weight: 500;") }}
+                            {{ form.location(class="form-control", style="border-radius: 10px; border: 2px solid #e0e0e0; padding: 10px;", placeholder="г. Москва, ул. Тверская, д. 1") }}
+                            {% for error in form.location.errors %}
+                                <span class="text-danger">{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label" style="color: #1a1a2e; font-weight: 500;">Дата и время</label>
+                            <div class="row">
+                                <div class="col-7">
+                                    <input type="date" id="orderDate" name="order_date" class="form-control" style="border-radius: 10px; border: 2px solid #e0e0e0; padding: 10px;" min="{{ now_date }}" required>
+                                </div>
+                                <div class="col-5">
+                                    <input type="time" id="orderTime" name="order_time" class="form-control" style="border-radius: 10px; border: 2px solid #e0e0e0; padding: 10px;" step="3600" required>
+                                </div>
+                            </div>
+                            <small class="text-muted">Выберите дату и время (не может быть в прошлом)</small>
+                            {% for error in form.date.errors %}
+                                <span class="text-danger">{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    
+                    <!-- Блок с расчетом стоимости -->
+                    <div style="background: #f8f9fa; padding: 20px; border-radius: 10px; margin: 20px 0; border-left: 4px solid #1a1a2e;">
+                        <h6 style="color: #1a1a2e; font-weight: bold;">💰 Расчет стоимости</h6>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p style="margin: 5px 0; color: #666;">Базовая цена:</p>
+                                <p style="margin: 5px 0; color: #666;">Срочность (менее 24ч):</p>
+                                <p style="margin: 5px 0; color: #666; font-weight: bold;">Итого:</p>
+                            </div>
+                            <div class="col-md-6 text-end">
+                                <p style="margin: 5px 0; color: #1a1a2e;" id="basePriceDisplay">0 ₽</p>
+                                <p style="margin: 5px 0; color: #1a1a2e;" id="urgencyDisplay">Нет</p>
+                                <p style="margin: 5px 0; color: #28a745; font-weight: bold; font-size: 1.2rem;" id="totalPriceDisplay">0 ₽</p>
+                            </div>
+                        </div>
+                        <p style="font-size: 0.8rem; color: #999; margin-top: 10px;">* Срочные заказы (менее 24 часов) оплачиваются с коэффициентом 1.5</p>
+                    </div>
+                    
+                    <div class="d-grid">
+                        <button type="submit" class="btn" style="padding: 14px; border-radius: 25px; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%); color: white; border: none; font-weight: bold; font-size: 1.1rem;">
+                            <i class="bi bi-send"></i> Отправить заявку
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Цены на услуги
+const prices = {
+    'consultation': 1500,
+    'document': 3000,
+    'court': 8000,
+    'government': 5000
+};
+
+document.addEventListener('DOMContentLoaded', function() {
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, '0');
+    const day = String(today.getDate()).padStart(2, '0');
+    const minDate = year + '-' + month + '-' + day;
+    document.getElementById('orderDate').min = minDate;
+    document.getElementById('orderDate').value = minDate;
+    
+    const now = new Date();
+    now.setHours(now.getHours() + 1);
+    const hours = String(now.getHours()).padStart(2, '0');
+    const minutes = '00';
+    document.getElementById('orderTime').value = hours + ':' + minutes;
+    
+    document.getElementById('orderDate').addEventListener('change', updatePrice);
+    document.getElementById('orderTime').addEventListener('change', updatePrice);
+    
+    setTimeout(updatePrice, 100);
+});
+
+function updatePrice() {
+    const service = document.getElementById('serviceType').value;
+    const basePrice = prices[service] || 0;
+    
+    const date = document.getElementById('orderDate').value;
+    const time = document.getElementById('orderTime').value;
+    let isUrgent = false;
+    if (date && time) {
+        const orderTime = new Date(date + 'T' + time + ':00');
+        const now = new Date();
+        const diffHours = (orderTime - now) / (1000 * 60 * 60);
+        isUrgent = diffHours < 24 && diffHours > 0;
+    }
+    
+    const totalPrice = isUrgent ? Math.round(basePrice * 1.5) : basePrice;
+    
+    document.getElementById('basePriceDisplay').textContent = basePrice + ' ₽';
+    document.getElementById('urgencyDisplay').textContent = isUrgent ? 'Да (x1.5)' : 'Нет';
+    document.getElementById('totalPriceDisplay').textContent = totalPrice + ' ₽';
+}
+
+document.getElementById('serviceType').addEventListener('change', updatePrice);
+</script>
+{% endblock %}

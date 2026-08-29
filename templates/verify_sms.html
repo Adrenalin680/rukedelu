@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+
+{% block title %}Подтверждение SMS{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center mt-5">
+    <div class="col-md-6">
+        <div class="card" style="border-radius: 15px; border: none; box-shadow: 0 10px 30px rgba(0,0,0,0.2);">
+            <div class="card-header" style="background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%); border-radius: 15px 15px 0 0; color: white; padding: 20px;">
+                <h4 class="mb-0 text-center"><i class="bi bi-phone"></i> Подтверждение по SMS</h4>
+            </div>
+            <div class="card-body" style="padding: 30px;">
+                <div style="text-align: center; padding: 20px; background: #e8f5e9; border-radius: 10px; margin-bottom: 20px;">
+                    <h5 style="color: #1a1a2e;">📱 Код отправлен!</h5>
+                    <p style="color: #666;">На номер <strong>{{ phone }}</strong> отправлен код подтверждения</p>
+                    <div style="background: white; padding: 15px; border-radius: 10px; margin-top: 10px;">
+                        <p style="color: #1a1a2e; font-weight: bold; margin: 0;">
+                            (ДЕМО) Код: <span style="color: #dc3545; font-size: 1.5rem; letter-spacing: 5px;" id="demoCode">....</span>
+                        </p>
+                        <p style="color: #999; font-size: 0.8rem; margin: 5px 0 0 0;">Код также отображается в консоли терминала</p>
+                    </div>
+                </div>
+                
+                <form method="POST" style="max-width: 300px; margin: 0 auto;">
+                    <div class="mb-3">
+                        <label style="color: #1a1a2e; font-weight: 500; display: block; text-align: center; margin-bottom: 10px;">Введите 6-значный код</label>
+                        <input type="text" name="sms_code" class="form-control" 
+                               style="border-radius: 10px; border: 2px solid #e0e0e0; padding: 15px; font-size: 1.5rem; text-align: center; letter-spacing: 8px;"
+                               placeholder="• • • • • •" maxlength="6" required autofocus>
+                    </div>
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn" style="padding: 12px; border-radius: 25px; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%); color: white; border: none; font-weight: bold; font-size: 1.1rem;">
+                            <i class="bi bi-check-circle"></i> Подтвердить
+                        </button>
+                    </div>
+                </form>
+                
+                <hr style="border-color: #e0e0e0; margin-top: 25px;">
+                <p class="text-center" style="color: #666; font-size: 0.85rem;">
+                    <a href="#" onclick="resendCode()" style="color: #1a1a2e; font-weight: bold; text-decoration: none;">Отправить код снова</a>
+                </p>
+                <p class="text-center" style="color: #999; font-size: 0.8rem;">
+                    В демо-режиме код отображается на этой странице и в терминале
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Показываем демо-код на странице
+document.addEventListener('DOMContentLoaded', function() {
+    // Получаем код из скрытого элемента или генерируем
+    const demoCodeSpan = document.getElementById('demoCode');
+    // В реальности код придет с сервера, но для демо используем случайный
+    const code = Math.floor(100000 + Math.random() * 900000).toString();
+    demoCodeSpan.textContent = code;
+    
+    // Сохраняем в поле для удобства
+    document.querySelector('input[name="sms_code"]').value = code;
+});
+
+function resendCode() {
+    alert('Новый код отправлен! Проверьте консоль терминала.');
+    const newCode = Math.floor(100000 + Math.random() * 900000).toString();
+    document.getElementById('demoCode').textContent = newCode;
+    document.querySelector('input[name="sms_code"]').value = newCode;
+}
+</script>
+{% endblock %}

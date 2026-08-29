@@ -1,0 +1,245 @@
+{% extends "base.html" %}
+
+{% block title %}Регистрация юриста{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center mt-4">
+    <div class="col-md-8">
+        <div class="card" style="border-radius: 15px; border: none; box-shadow: 0 10px 30px rgba(0,0,0,0.2);">
+            <div class="card-header" style="background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%); border-radius: 15px 15px 0 0; color: white; padding: 20px;">
+                <h4 class="mb-0 text-center"><i class="bi bi-briefcase"></i> Регистрация юриста</h4>
+            </div>
+            <div class="card-body" style="padding: 30px;">
+                <div class="alert alert-info" style="border-radius: 10px;">
+                    <i class="bi bi-info-circle"></i>
+                    <strong>Внимание!</strong> Регистрация юриста возможна только после загрузки документов и проверки данных. 
+                    Проверка может занять до 3 рабочих дней.
+                </div>
+                
+                <form method="POST" enctype="multipart/form-data">
+                    {{ form.hidden_tag() }}
+                    
+                    <h5 style="color: #1a1a2e; border-bottom: 2px solid #1a1a2e; padding-bottom: 10px; margin-top: 20px;">
+                        <i class="bi bi-person"></i> Основные данные
+                    </h5>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            {{ form.email.label(class="form-label", style="color: #1a1a2e; font-weight: 500;") }}
+                            {{ form.email(class="form-control", style="border-radius: 10px; border: 2px solid #e0e0e0; padding: 10px;") }}
+                            {% for error in form.email.errors %}
+                                <span class="text-danger">{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            {{ form.password.label(class="form-label", style="color: #1a1a2e; font-weight: 500;") }}
+                            {{ form.password(class="form-control", style="border-radius: 10px; border: 2px solid #e0e0e0; padding: 10px;") }}
+                            {% for error in form.password.errors %}
+                                <span class="text-danger">{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            {{ form.name.label(class="form-label", style="color: #1a1a2e; font-weight: 500;") }}
+                            {{ form.name(class="form-control", style="border-radius: 10px; border: 2px solid #e0e0e0; padding: 10px;", placeholder="Иванов Иван Иванович") }}
+                            {% for error in form.name.errors %}
+                                <span class="text-danger">{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            {{ form.phone.label(class="form-label", style="color: #1a1a2e; font-weight: 500;") }}
+                            {{ form.phone(class="form-control", style="border-radius: 10px; border: 2px solid #e0e0e0; padding: 10px;", placeholder="+7 999 999-99-99") }}
+                            {% for error in form.phone.errors %}
+                                <span class="text-danger">{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    
+                    <h5 style="color: #1a1a2e; border-bottom: 2px solid #1a1a2e; padding-bottom: 10px; margin-top: 25px;">
+                        <i class="bi bi-passport"></i> Паспортные данные
+                    </h5>
+                    
+                    <div class="row">
+                        <div class="col-md-3 mb-3">
+                            {{ form.passport_series.label(class="form-label", style="color: #1a1a2e; font-weight: 500;") }}
+                            {{ form.passport_series(class="form-control", style="border-radius: 10px; border: 2px solid #e0e0e0; padding: 10px;", placeholder="1111") }}
+                            {% for error in form.passport_series.errors %}
+                                <span class="text-danger">{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            {{ form.passport_number.label(class="form-label", style="color: #1a1a2e; font-weight: 500;") }}
+                            {{ form.passport_number(class="form-control", style="border-radius: 10px; border: 2px solid #e0e0e0; padding: 10px;", placeholder="222222") }}
+                            {% for error in form.passport_number.errors %}
+                                <span class="text-danger">{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            {{ form.passport_issued.label(class="form-label", style="color: #1a1a2e; font-weight: 500;") }}
+                            {{ form.passport_issued(class="form-control", style="border-radius: 10px; border: 2px solid #e0e0e0; padding: 10px;") }}
+                            {% for error in form.passport_issued.errors %}
+                                <span class="text-danger">{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            {{ form.passport_date.label(class="form-label", style="color: #1a1a2e; font-weight: 500;") }}
+                            {{ form.passport_date(class="form-control", style="border-radius: 10px; border: 2px solid #e0e0e0; padding: 10px;", placeholder="01.01.2020") }}
+                            {% for error in form.passport_date.errors %}
+                                <span class="text-danger">{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            {{ form.birth_date.label(class="form-label", style="color: #1a1a2e; font-weight: 500;") }}
+                            {{ form.birth_date(class="form-control", style="border-radius: 10px; border: 2px solid #e0e0e0; padding: 10px;", placeholder="01.01.1980") }}
+                            {% for error in form.birth_date.errors %}
+                                <span class="text-danger">{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    
+                    <h5 style="color: #1a1a2e; border-bottom: 2px solid #1a1a2e; padding-bottom: 10px; margin-top: 25px;">
+                        <i class="bi bi-file-earmark"></i> Загрузка документов
+                    </h5>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            {{ form.passport_file.label(class="form-label", style="color: #1a1a2e; font-weight: 500;") }}
+                            {{ form.passport_file(class="form-control", style="border-radius: 10px; border: 2px solid #e0e0e0; padding: 10px;") }}
+                            <small class="text-muted">Фото главного разворота и страницы с пропиской</small>
+                            {% for error in form.passport_file.errors %}
+                                <span class="text-danger">{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            {{ form.inn_file.label(class="form-label", style="color: #1a1a2e; font-weight: 500;") }}
+                            {{ form.inn_file(class="form-control", style="border-radius: 10px; border: 2px solid #e0e0e0; padding: 10px;") }}
+                            {% for error in form.inn_file.errors %}
+                                <span class="text-danger">{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            {{ form.snils_file.label(class="form-label", style="color: #1a1a2e; font-weight: 500;") }}
+                            {{ form.snils_file(class="form-control", style="border-radius: 10px; border: 2px solid #e0e0e0; padding: 10px;") }}
+                            {% for error in form.snils_file.errors %}
+                                <span class="text-danger">{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            {{ form.diploma_file.label(class="form-label", style="color: #1a1a2e; font-weight: 500;") }}
+                            {{ form.diploma_file(class="form-control", style="border-radius: 10px; border: 2px solid #e0e0e0; padding: 10px;") }}
+                            <small class="text-muted">Диплом с приложением (оценки)</small>
+                            {% for error in form.diploma_file.errors %}
+                                <span class="text-danger">{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            {{ form.photo_file.label(class="form-label", style="color: #1a1a2e; font-weight: 500;") }}
+                            {{ form.photo_file(class="form-control", style="border-radius: 10px; border: 2px solid #e0e0e0; padding: 10px;") }}
+                            <small class="text-muted">Четкое фото для профиля</small>
+                            {% for error in form.photo_file.errors %}
+                                <span class="text-danger">{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div style="padding: 20px; background: #f8f9fa; border-radius: 10px; height: 100%; display: flex; align-items: center;">
+                                <div>
+                                    <i class="bi bi-check-circle" style="color: #28a745; font-size: 1.5rem;"></i>
+                                    <p style="margin: 5px 0 0 0; color: #666; font-size: 0.9rem;">
+                                        <strong>Все документы обязательны</strong><br>
+                                        Без загрузки всех файлов регистрация невозможна
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <h5 style="color: #1a1a2e; border-bottom: 2px solid #1a1a2e; padding-bottom: 10px; margin-top: 25px;">
+                        <i class="bi bi-gavel"></i> Для адвокатов (дополнительно)
+                    </h5>
+                    
+                    <div class="mb-3">
+                        {{ form.is_lawyer() }} {{ form.is_lawyer.label(style="color: #1a1a2e; font-weight: 500; margin-left: 5px;") }}
+                    </div>
+                    
+                    <div id="lawyer_docs" style="display: none;">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                {{ form.lawyer_license_file.label(class="form-label", style="color: #1a1a2e; font-weight: 500;") }}
+                                {{ form.lawyer_license_file(class="form-control", style="border-radius: 10px; border: 2px solid #e0e0e0; padding: 10px;") }}
+                                {% for error in form.lawyer_license_file.errors %}
+                                    <span class="text-danger">{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                {{ form.registry_extract_file.label(class="form-label", style="color: #1a1a2e; font-weight: 500;") }}
+                                {{ form.registry_extract_file(class="form-control", style="border-radius: 10px; border: 2px solid #e0e0e0; padding: 10px;") }}
+                                {% for error in form.registry_extract_file.errors %}
+                                    <span class="text-danger">{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <h5 style="color: #1a1a2e; border-bottom: 2px solid #1a1a2e; padding-bottom: 10px; margin-top: 25px;">
+                        <i class="bi bi-check2-square"></i> Согласия
+                    </h5>
+                    
+                    <div class="mb-2">
+                        {{ form.agree_terms() }} 
+                        {{ form.agree_terms.label(style="color: #1a1a2e; margin-left: 5px;") }}
+                        <a href="#" onclick="document.getElementById('agreementModal').style.display='flex'; return false;" 
+                           style="color: #1a1a2e; font-weight: bold; text-decoration: underline;">
+                            Пользовательское соглашение
+                        </a>
+                        {% for error in form.agree_terms.errors %}
+                            <br><span class="text-danger">{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                    
+                    <div class="mb-2">
+                        {{ form.agree_data() }} 
+                        {{ form.agree_data.label(style="color: #1a1a2e; margin-left: 5px;") }}
+                        {% for error in form.agree_data.errors %}
+                            <br><span class="text-danger">{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                    
+                    <div class="mb-3">
+                        {{ form.agree_check() }} 
+                        {{ form.agree_check.label(style="color: #1a1a2e; margin-left: 5px;") }}
+                        {% for error in form.agree_check.errors %}
+                            <br><span class="text-danger">{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                    
+                    <div class="d-grid">
+                        {{ form.submit(class="btn", style="padding: 14px; border-radius: 25px; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%); color: white; border: none; font-weight: bold; font-size: 1.1rem;") }}
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.getElementById('is_lawyer').addEventListener('change', function() {
+    var docs = document.getElementById('lawyer_docs');
+    if (this.checked) {
+        docs.style.display = 'block';
+    } else {
+        docs.style.display = 'none';
+    }
+});
+</script>
+{% endblock %}

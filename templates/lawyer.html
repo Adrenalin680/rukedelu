@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block title %}Юрист{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center mt-5">
+    <div class="col-md-6">
+        <div class="card" style="border-radius: 15px; border: none; box-shadow: 0 10px 30px rgba(0,0,0,0.2);">
+            <div class="card-header" style="background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%); border-radius: 15px 15px 0 0; color: white; padding: 20px;">
+                <h4 class="mb-0 text-center"><i class="bi bi-briefcase"></i> Юрист</h4>
+            </div>
+            <div class="card-body text-center" style="padding: 30px;">
+                {% if current_user.is_authenticated %}
+                    <div class="alert alert-success" style="border-radius: 10px; border: none; background: #e8f5e9; color: #1a1a2e; padding: 20px;">
+                        <h5>✅ Вы уже вошли как {{ current_user.name }}</h5>
+                        <a href="{{ url_for('lawyer_dashboard') }}" class="btn" style="margin-top: 15px; padding: 10px 40px; border-radius: 25px; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%); color: white; border: none; font-size: 1rem;">Перейти в кабинет</a>
+                    </div>
+                {% else %}
+                    <h5 style="margin-bottom: 25px; color: #1a1a2e; font-weight: 500;">Хочу принимать заказы и зарабатывать</h5>
+                    <div class="d-grid gap-3" style="max-width: 300px; margin: 0 auto;">
+                        <a href="{{ url_for('login') }}" class="btn" style="padding: 12px; border-radius: 25px; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%); color: white; border: none; font-weight: bold; font-size: 1.1rem;">
+                            <i class="bi bi-box-arrow-in-right"></i> Войти
+                        </a>
+                        <a href="{{ url_for('register') }}" class="btn" style="padding: 12px; border-radius: 25px; background: white; color: #1a1a2e; border: 2px solid #1a1a2e; font-weight: bold; font-size: 1.1rem;">
+                            <i class="bi bi-person-plus"></i> Зарегистрироваться
+                        </a>
+                    </div>
+                    <hr style="border-color: #e0e0e0; margin-top: 25px;">
+                    <p style="color: #666; font-size: 0.85rem;">После входа вы сможете принимать заказы и зарабатывать</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

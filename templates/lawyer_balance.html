@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+
+{% block title %}Мой баланс{% endblock %}
+
+{% block content %}
+<div class="row mt-4">
+    <div class="col-md-12">
+        <div class="card" style="border-radius: 15px; border: none; box-shadow: 0 10px 30px rgba(0,0,0,0.2);">
+            <div class="card-header" style="background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%); border-radius: 15px 15px 0 0; color: white; padding: 20px;">
+                <h4 class="mb-0"><i class="bi bi-wallet"></i> Мой баланс</h4>
+            </div>
+            <div class="card-body" style="padding: 30px;">
+                <div style="text-align: center; padding: 20px; background: #f8f9fa; border-radius: 15px; margin-bottom: 30px;">
+                    <h5 style="color: #666;">Доступно к выводу</h5>
+                    <h1 style="color: #28a745; font-weight: bold;">{{ balance }} ₽</h1>
+                </div>
+                
+                <h5 style="color: #1a1a2e;">История транзакций</h5>
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Дата</th>
+                                <th>Тип</th>
+                                <th>Сумма</th>
+                                <th>Описание</th>
+                                <th>Статус</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for transaction in transactions %}
+                            <tr>
+                                <td>{{ transaction.created_at.strftime('%d.%m.%Y %H:%M') }}</td>
+                                <td>
+                                    {% if transaction.type == 'charge' %}
+                                        <span class="badge bg-success">Зачисление</span>
+                                    {% elif transaction.type == 'commission' %}
+                                        <span class="badge bg-warning">Комиссия</span>
+                                    {% else %}
+                                        <span class="badge bg-info">{{ transaction.type }}</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if transaction.amount > 0 %}
+                                        <span style="color: #28a745;">+{{ transaction.amount }} ₽</span>
+                                    {% else %}
+                                        <span style="color: #dc3545;">{{ transaction.amount }} ₽</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ transaction.description or '-' }}</td>
+                                <td><span class="badge bg-success">Выполнено</span></td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,393 @@
+{% extends "base.html" %}
+
+{% block title %}Кабинет юриста{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+<script>
+var socket = io();
+
+socket.on('new_notification', function(data) {
+    showNotification(data.title, data.message, data.order_id);
+    addNotificationToList(data);
+});
+
+function showNotification(title, message, orderId) {
+    var notification = document.createElement('div');
+    notification.className = 'notification-toast';
+    notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+        color: white;
+        padding: 20px;
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        z-index: 10000;
+        max-width: 350px;
+        animation: slideIn 0.5s ease;
+        border-left: 4px solid #f0b90b;
+    `;
+    
+    notification.innerHTML = `
+        <div style="display: flex; justify-content: space-between; align-items: start;">
+            <div>
+                <h6 style="margin: 0; color: #f0b90b;">${title}</h6>
+                <p style="margin: 5px 0 0 0; font-size: 0.9rem;">${message}</p>
+                ${orderId ? '<button class="btn btn-sm" style="margin-top: 10px; padding: 5px 15px; border-radius: 15px; background: #f0b90b; color: #1a1a2e; border: none;" onclick="window.location.href=/order/' + orderId + '">Перейти к заказу</button>' : ''}
+            </div>
+            <button onclick="this.parentElement.parentElement.remove()" style="background: none; border: none; color: white; font-size: 1.2rem;">×</button>
+        </div>
+    `;
+    
+    document.body.appendChild(notification);
+    
+    setTimeout(function() {
+        if (notification.parentElement) {
+            notification.style.opacity = '0';
+            notification.style.transition = 'opacity 0.5s';
+            setTimeout(function() {
+                if (notification.parentElement) {
+                    notification.remove();
+                }
+            }, 500);
+        }
+    }, 10000);
+}
+
+function addNotificationToList(data) {
+    var list = document.getElementById('notification-list');
+    if (!list) return;
+    
+    var item = document.createElement('div');
+    item.className = 'notification-item';
+    item.style.cssText = `
+        padding: 10px;
+        border-bottom: 1px solid #eee;
+        cursor: pointer;
+        transition: background 0.3s;
+    `;
+    item.onmouseover = function() { this.style.background = '#f8f9fa'; };
+    item.onmouseout = function() { this.style.background = 'white'; };
+    item.onclick = function() {
+        if (data.order_id) {
+            window.location.href = '/order/' + data.order_id;
+        }
+    };
+    
+    item.innerHTML = `
+        <div style="display: flex; justify-content: space-between;">
+            <strong style="color: #1a1a2e;">${data.title}</strong>
+            <small style="color: #999;">${data.timestamp || 'только что'}</small>
+        </div>
+        <p style="margin: 5px 0 0 0; font-size: 0.9rem; color: #666;">${data.message}</p>
+    `;
+    
+    list.prepend(item);
+    document.getElementById('notification-count').textContent = list.children.length;
+}
+
+var style = document.createElement('style');
+style.textContent = `
+    @keyframes slideIn {
+        from { transform: translateX(100%); opacity: 0; }
+        to { transform: translateX(0); opacity: 1; }
+    }
+`;
+document.head.appendChild(style);
+
+function toggleOnline() {
+    $.ajax({
+        url: '/api/online_status',
+        method: 'POST',
+        success: function(data) {
+            if (data.online) {
+                document.getElementById('onlineStatus').textContent = 'Выключить онлайн';
+            } else {
+                document.getElementById('onlineStatus').textContent = 'Включить онлайн';
+            }
+        }
+    });
+}
+
+function acceptOrder(orderId) {
+    if (confirm('Взять заказ в работу?')) {
+        $.ajax({
+            url: '/api/order/' + orderId + '/accept',
+            method: 'POST',
+            success: function(data) {
+                alert('✅ ' + data.message);
+                location.reload();
+            },
+            error: function(xhr) {
+                alert('❌ ' + (xhr.responseJSON.error || 'Ошибка'));
+            }
+        });
+    }
+}
+
+// Загрузка статистики платформы
+function loadPlatformStats() {
+    $.ajax({
+        url: '/api/platform_stats',
+        method: 'GET',
+        success: function(data) {
+            document.getElementById('platformTotalOrders').textContent = data.total_orders;
+            document.getElementById('platformTotalCommission').textContent = data.total_commission + ' ₽';
+        },
+        error: function() {
+            // Если нет доступа — скрываем блок
+            document.getElementById('platformStatsBlock').style.display = 'none';
+        }
+    });
+}
+
+$(document).ready(function() {
+    loadPlatformStats();
+});
+</script>
+{% endblock %}
+
+{% block content %}
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2><i class="bi bi-briefcase"></i> Кабинет юриста</h2>
+            <div>
+                <button class="btn" onclick="toggleOnline()" style="padding: 10px 25px; border-radius: 25px; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%); color: white; border: none; font-weight: bold; margin-right: 10px;">
+                    <i class="bi bi-toggle-on"></i> <span id="onlineStatus">Включить онлайн</span>
+                </button>
+                <button class="btn" style="padding: 10px 25px; border-radius: 25px; background: #f0b90b; color: #1a1a2e; border: none; font-weight: bold;" onclick="document.getElementById('notification-panel').style.display='block'">
+                    <i class="bi bi-bell"></i> Уведомления <span class="badge bg-danger" id="notification-count">0</span>
+                </button>
+            </div>
+        </div>
+        
+        <div id="notification-panel" style="display: none; position: fixed; top: 80px; right: 20px; width: 350px; max-height: 500px; background: white; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); z-index: 9999; overflow: hidden;">
+            <div style="padding: 15px; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%); color: white; border-radius: 15px 15px 0 0; display: flex; justify-content: space-between; align-items: center;">
+                <h6 style="margin: 0;"><i class="bi bi-bell"></i> Уведомления</h6>
+                <button onclick="document.getElementById('notification-panel').style.display='none'" style="background: none; border: none; color: white; font-size: 1.5rem;">×</button>
+            </div>
+            <div id="notification-list" style="padding: 10px; max-height: 400px; overflow-y: auto;">
+                <p style="text-align: center; color: #999; padding: 20px;">Новых уведомлений нет</p>
+            </div>
+        </div>
+        
+        <!-- ====== БЛОК СТАТИСТИКИ ЮРИСТА ====== -->
+        <div class="row mb-4">
+            <div class="col-md-4">
+                <div class="card" style="border-radius: 15px; border: none; box-shadow: 0 5px 15px rgba(0,0,0,0.08); background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%); color: white; padding: 20px;">
+                    <h6 style="opacity: 0.8;"><i class="bi bi-wallet"></i> Доступно к выводу</h6>
+                    <h2 style="font-weight: bold; margin: 10px 0;">{{ current_user.balance or 0 }} ₽</h2>
+                    <small style="opacity: 0.7;">Уже заработанные средства</small>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card" style="border-radius: 15px; border: none; box-shadow: 0 5px 15px rgba(0,0,0,0.08); background: #f8f9fa; padding: 20px;">
+                    <h6 style="color: #666;"><i class="bi bi-clock-history"></i> В ожидании</h6>
+                    <h2 style="font-weight: bold; margin: 10px 0; color: #ffc107;">{{ my_orders|selectattr('status', 'equalto', 'in_progress')|sum(attribute='lawyer_amount') }} ₽</h2>
+                    <small style="color: #999;">Заказы в работе (ждём подтверждения клиента)</small>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card" style="border-radius: 15px; border: none; box-shadow: 0 5px 15px rgba(0,0,0,0.08); background: #e8f5e9; padding: 20px;">
+                    <h6 style="color: #2e7d32;"><i class="bi bi-bar-chart"></i> Всего заработано</h6>
+                    <h2 style="font-weight: bold; margin: 10px 0; color: #28a745;">{{ my_orders|selectattr('status', 'equalto', 'completed')|sum(attribute='lawyer_amount') }} ₽</h2>
+                    <small style="color: #666;">За всё время работы</small>
+                </div>
+            </div>
+        </div>
+        
+        <!-- ====== СТАТИСТИКА ПЛАТФОРМЫ (для владельца) ====== -->
+        <div id="platformStatsBlock" class="row mb-4">
+            <div class="col-12">
+                <div class="card" style="border-radius: 15px; border: none; box-shadow: 0 5px 15px rgba(0,0,0,0.08); background: linear-gradient(135deg, #f5f5f5 0%, #e8e8e8 100%); padding: 20px;">
+                    <h6 style="color: #1a1a2e; font-weight: bold; margin-bottom: 15px;">
+                        <i class="bi bi-currency-dollar"></i> Статистика платформы (владельцу)
+                    </h6>
+                    <div class="row text-center">
+                        <div class="col-md-4">
+                            <h6 style="color: #666;">📦 Всего заказов</h6>
+                            <h3 style="color: #1a1a2e; font-weight: bold;" id="platformTotalOrders">0</h3>
+                        </div>
+                        <div class="col-md-4">
+                            <h6 style="color: #666;">💰 Заработано платформой</h6>
+                            <h3 style="color: #f0b90b; font-weight: bold;" id="platformTotalCommission">0 ₽</h3>
+                            <small style="color: #999;">Комиссия 10% со всех заказов</small>
+                        </div>
+                        <div class="col-md-4">
+                            <h6 style="color: #666;">📊 Выплачено юристам</h6>
+                            <h3 style="color: #28a745; font-weight: bold;" id="platformTotalLawyerPayments">0 ₽</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- ====== КОНЕЦ СТАТИСТИКИ ПЛАТФОРМЫ ====== -->
+        
+        <ul class="nav nav-tabs" id="myTab" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="available-tab" data-bs-toggle="tab" data-bs-target="#available" type="button" role="tab">
+                    <i class="bi bi-clock-history"></i> Доступные заказы
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="myorders-tab" data-bs-toggle="tab" data-bs-target="#myorders" type="button" role="tab">
+                    <i class="bi bi-list-check"></i> Мои заказы
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="transactions-tab" data-bs-toggle="tab" data-bs-target="#transactions" type="button" role="tab">
+                    <i class="bi bi-receipt"></i> История транзакций
+                </button>
+            </li>
+        </ul>
+        
+        <div class="tab-content mt-3" id="myTabContent">
+            <div class="tab-pane fade show active" id="available" role="tabpanel">
+                {% if available_orders %}
+                    {% for order in available_orders %}
+                        <div class="card mb-3" style="border-radius: 15px; border: none; box-shadow: 0 5px 15px rgba(0,0,0,0.08);">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-8">
+                                        <h5>
+                                            {% if order.service_type == 'consultation' %}📞 Консультация
+                                            {% elif order.service_type == 'document' %}📄 Составление документа
+                                            {% elif order.service_type == 'court' %}⚖️ Представление в суде
+                                            {% else %}🏛️ Представление в госорганах
+                                            {% endif %}
+                                            {% if order.is_urgent %}
+                                                <span class="urgent-badge">🚨 Срочно</span>
+                                            {% endif %}
+                                        </h5>
+                                        <p class="text-muted">{{ order.description[:150] }}...</p>
+                                        <small>
+                                            <i class="bi bi-geo-alt"></i> {{ order.location }} &nbsp;
+                                            <i class="bi bi-calendar"></i> {{ order.date.strftime('%d.%m.%Y %H:%M') }}
+                                        </small>
+                                    </div>
+                                    <div class="col-md-4 text-end">
+                                        <div class="price-tag">{{ order.price }} ₽</div>
+                                        <small style="color: #999; display: block;">К выплате: {{ order.lawyer_amount }} ₽</small>
+                                        <a href="{{ url_for('order_detail', order_id=order.id) }}" class="btn btn-sm" style="margin-top: 10px; padding: 8px 25px; border-radius: 20px; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%); color: white; border: none;">
+                                            Подробнее
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="alert alert-info text-center" style="border-radius: 15px; border: none; background: #f8f9fa; padding: 40px;">
+                        <h5>📭 Нет доступных заказов</h5>
+                        <p style="color: #666;">Включите онлайн статус, чтобы получать заказы</p>
+                    </div>
+                {% endif %}
+            </div>
+            
+            <div class="tab-pane fade" id="myorders" role="tabpanel">
+                {% if my_orders %}
+                    {% for order in my_orders %}
+                        <div class="card mb-3" style="border-radius: 15px; border: none; box-shadow: 0 5px 15px rgba(0,0,0,0.08);">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-7">
+                                        <h5>
+                                            {% if order.service_type == 'consultation' %}📞 Консультация
+                                            {% elif order.service_type == 'document' %}📄 Составление документа
+                                            {% elif order.service_type == 'court' %}⚖️ Представление в суде
+                                            {% else %}🏛️ Представление в госорганах
+                                            {% endif %}
+                                        </h5>
+                                        <p><strong>Клиент:</strong> {{ order.client.name }}</p>
+                                        <p class="text-muted">{{ order.description[:150] }}...</p>
+                                        <small>
+                                            <i class="bi bi-calendar"></i> {{ order.date.strftime('%d.%m.%Y %H:%M') }}
+                                        </small>
+                                    </div>
+                                    <div class="col-md-5 text-end">
+                                        <div class="price-tag">{{ order.price }} ₽</div>
+                                        <small style="color: #999; display: block;">К выплате: {{ order.lawyer_amount }} ₽</small>
+                                        <span class="badge 
+                                            {% if order.status == 'pending' %}bg-warning
+                                            {% elif order.status == 'accepted' %}bg-info
+                                            {% elif order.status == 'in_progress' %}bg-primary
+                                            {% elif order.status == 'completed' %}bg-success
+                                            {% else %}bg-secondary{% endif %}" style="font-size: 0.9rem; padding: 5px 12px; margin-top: 5px;">
+                                            {% if order.status == 'pending' %}⏳ Ожидает
+                                            {% elif order.status == 'accepted' %}🔄 Принят
+                                            {% elif order.status == 'in_progress' %}⚡ Выполняется
+                                            {% elif order.status == 'completed' %}✅ Выполнен
+                                            {% else %}❌ Отменен{% endif %}
+                                        </span>
+                                        <br>
+                                        <a href="{{ url_for('order_detail', order_id=order.id) }}" class="btn btn-sm" style="margin-top: 10px; padding: 5px 20px; border-radius: 20px; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%); color: white; border: none;">
+                                            Подробнее
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="alert alert-info text-center" style="border-radius: 15px; border: none; background: #f8f9fa; padding: 40px;">
+                        <h5>📋 У вас пока нет заказов</h5>
+                        <p style="color: #666;">Принимайте заказы из раздела "Доступные заказы"</p>
+                    </div>
+                {% endif %}
+            </div>
+            
+            <div class="tab-pane fade" id="transactions" role="tabpanel">
+                <div class="card" style="border-radius: 15px; border: none; box-shadow: 0 5px 15px rgba(0,0,0,0.08);">
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Дата</th>
+                                        <th>Тип</th>
+                                        <th>Сумма</th>
+                                        <th>Заказ</th>
+                                        <th>Статус</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for t in transactions %}
+                                    <tr>
+                                        <td>{{ t.created_at.strftime('%d.%m.%Y %H:%M') }}</td>
+                                        <td>
+                                            {% if t.type == 'charge' %}
+                                                <span class="badge bg-success">Зачисление</span>
+                                            {% elif t.type == 'hold' %}
+                                                <span class="badge bg-warning">Блокировка</span>
+                                            {% elif t.type == 'commission' %}
+                                                <span class="badge bg-info">Комиссия</span>
+                                            {% else %}
+                                                <span class="badge bg-secondary">{{ t.type }}</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if t.type == 'charge' %}
+                                                <span style="color: #28a745;">+{{ t.amount }} ₽</span>
+                                            {% elif t.type == 'commission' %}
+                                                <span style="color: #ffc107;">-{{ t.amount }} ₽</span>
+                                            {% else %}
+                                                <span style="color: #666;">{{ t.amount }} ₽</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>#{{ t.order_id }}</td>
+                                        <td><span class="badge bg-success">✅ Выполнено</span></td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

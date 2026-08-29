@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+
+{% block title %}Мои заказы{% endblock %}
+
+{% block content %}
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2><i class="bi bi-list-ul"></i> Мои заказы</h2>
+            <a href="{{ url_for('new_order') }}" class="btn" style="padding: 10px 30px; border-radius: 25px; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%); color: white; border: none; font-weight: bold;">
+                <i class="bi bi-plus-circle"></i> Создать заказ
+            </a>
+        </div>
+        
+        {% if orders %}
+            {% for order in orders %}
+                <div class="card mb-3" style="border-radius: 15px; border: none; box-shadow: 0 5px 15px rgba(0,0,0,0.08);">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-8">
+                                <h5>
+                                    {% if order.service_type == 'consultation' %}📞 Консультация
+                                    {% elif order.service_type == 'document' %}📄 Составление документа
+                                    {% elif order.service_type == 'court' %}⚖️ Представление в суде
+                                    {% else %}🏛️ Представление в госорганах
+                                    {% endif %}
+                                    {% if order.is_urgent %}
+                                        <span class="urgent-badge">🚨 Срочно</span>
+                                    {% endif %}
+                                </h5>
+                                <p class="text-muted">{{ order.description[:150] }}...</p>
+                                <small>
+                                    <i class="bi bi-geo-alt"></i> {{ order.location }} &nbsp;
+                                    <i class="bi bi-calendar"></i> {{ order.date.strftime('%d.%m.%Y %H:%M') }}
+                                </small>
+                            </div>
+                            <div class="col-md-4 text-end">
+                                <div class="price-tag">{{ order.price }} ₽</div>
+                                <span class="badge 
+                                    {% if order.status == 'pending' %}bg-warning
+                                    {% elif order.status == 'accepted' %}bg-info
+                                    {% elif order.status == 'completed' %}bg-success
+                                    {% else %}bg-secondary{% endif %}" style="font-size: 0.9rem; padding: 5px 12px;">
+                                    {% if order.status == 'pending' %}⏳ Ожидает юриста
+                                    {% elif order.status == 'accepted' %}✅ Принят
+                                    {% elif order.status == 'completed' %}✔️ Выполнен
+                                    {% else %}❌ Отменен{% endif %}
+                                </span>
+                                <br>
+                                <a href="{{ url_for('order_detail', order_id=order.id) }}" class="btn btn-sm" style="margin-top: 10px; padding: 5px 20px; border-radius: 20px; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%); color: white; border: none;">
+                                    Подробнее
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <div class="alert alert-info text-center" style="border-radius: 15px; border: none; background: #f8f9fa; padding: 40px;">
+                <h5 style="color: #1a1a2e;">📋 У вас пока нет заказов</h5>
+                <p style="color: #666;">Создайте свой первый заказ прямо сейчас!</p>
+                <a href="{{ url_for('new_order') }}" class="btn" style="margin-top: 10px; padding: 10px 40px; border-radius: 25px; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%); color: white; border: none; font-weight: bold;">
+                    <i class="bi bi-plus-circle"></i> Создать заказ
+                </a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

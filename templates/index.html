@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+
+{% block title %}Главная{% endblock %}
+
+{% block content %}
+<div class="hero-section" style="border-radius: 20px; margin: 20px; padding: 25px 0; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);">
+    <div class="container text-center">
+        <h1 style="font-size: 1.8rem; font-weight: bold; text-transform: uppercase; line-height: 1.3; color: white; margin-bottom: 8px;">
+            ЕДИНАЯ ЦИФРОВАЯ ПЛАТФОРМА<br>
+            ЮРИСТОВ РОССИИ
+        </h1>
+        <p style="font-size: 1rem; margin-top: 5px; color: white; font-weight: bold;">Ваше Дело найдёт своего юриста</p>
+        
+        <div class="row mt-3 justify-content-center">
+            <div class="col-md-5">
+                <div class="card service-card" style="border-radius: 15px; background: white; border: none; box-shadow: 0 10px 30px rgba(0,0,0,0.3);">
+                    <div class="card-body text-center p-3">
+                        <i class="bi bi-person" style="font-size: 2rem; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;"></i>
+                        <h5 class="mt-2" style="color: #1a1a2e; font-size: 1.1rem;">Клиент</h5>
+                        <p style="font-size: 0.85rem; color: #666; margin-bottom: 10px;">Получите срочную юридическую помощь</p>
+                        <a href="{{ url_for('client') }}" class="btn" style="padding: 8px 35px; border-radius: 25px; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%); color: white; border: none; font-size: 0.9rem;">Я клиент</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-5">
+                <div class="card service-card" style="border-radius: 15px; background: white; border: none; box-shadow: 0 10px 30px rgba(0,0,0,0.3);">
+                    <div class="card-body text-center p-3">
+                        <i class="bi bi-briefcase" style="font-size: 2rem; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;"></i>
+                        <h5 class="mt-2" style="color: #1a1a2e; font-size: 1.1rem;">Юрист</h5>
+                        <p style="font-size: 0.85rem; color: #666; margin-bottom: 10px;">Принимайте заказы и зарабатывайте</p>
+                        <a href="{{ url_for('lawyer') }}" class="btn" style="padding: 8px 35px; border-radius: 25px; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%); color: white; border: none; font-size: 0.9rem;">Я юрист</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container mt-3">
+    <h5 class="text-center mb-3" style="color: #1a1a2e; font-weight: bold; font-size: 1.1rem;">Как это работает</h5>
+    <div class="row text-center">
+        <div class="col-3">
+            <div style="padding: 12px 8px; background: #f8f9fa; border-radius: 12px; margin: 0 3px;">
+                <i class="bi bi-pencil-square" style="font-size: 2rem; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;"></i>
+                <p style="font-size: 0.85rem; margin: 6px 0 2px 0; font-weight: bold; color: #1a1a2e;">1. Заявка</p>
+                <p style="font-size: 0.7rem; color: #666; margin: 0;">Опишите проблему</p>
+            </div>
+        </div>
+        <div class="col-3">
+            <div style="padding: 12px 8px; background: #f8f9fa; border-radius: 12px; margin: 0 3px;">
+                <i class="bi bi-people" style="font-size: 2rem; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;"></i>
+                <p style="font-size: 0.85rem; margin: 6px 0 2px 0; font-weight: bold; color: #1a1a2e;">2. Юрист</p>
+                <p style="font-size: 0.7rem; color: #666; margin: 0;">Находит вас</p>
+            </div>
+        </div>
+        <div class="col-3">
+            <div style="padding: 12px 8px; background: #f8f9fa; border-radius: 12px; margin: 0 3px;">
+                <i class="bi bi-lock" style="font-size: 2rem; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;"></i>
+                <p style="font-size: 0.85rem; margin: 6px 0 2px 0; font-weight: bold; color: #1a1a2e;">3. Блокировка</p>
+                <p style="font-size: 0.7rem; color: #666; margin: 0;">Средств</p>
+            </div>
+        </div>
+        <div class="col-3">
+            <div style="padding: 12px 8px; background: #f8f9fa; border-radius: 12px; margin: 0 3px;">
+                <i class="bi bi-check-circle" style="font-size: 2rem; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;"></i>
+                <p style="font-size: 0.85rem; margin: 6px 0 2px 0; font-weight: bold; color: #1a1a2e;">4. Оплата</p>
+                <p style="font-size: 0.7rem; color: #666; margin: 0;">После работы</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
