@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Тест оценки</title>
+</head>
+<body>
+    <h1>Тест оценки юриста</h1>
+    <p>Заказ #5</p>
+    <button onclick="sendRating()">Оценить на 8</button>
+    <div id="result"></div>
+    <script>
+    function sendRating() {
+        fetch('/api/order/5/rate', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({score: 8, comment: 'Тестовая оценка'})
+        })
+        .then(r => r.json())
+        .then(data => {
+            document.getElementById('result').innerHTML = '<pre>' + JSON.stringify(data, null, 2) + '</pre>';
+        })
+        .catch(e => {
+            document.getElementById('result').innerHTML = 'Ошибка: ' + e;
+        });
+    }
+    </script>
+</body>
+</html>
